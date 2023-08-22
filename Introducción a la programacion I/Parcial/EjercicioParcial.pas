@@ -22,3 +22,5 @@ procedure Inviertir(var arr: TArregloCar; posinicial);
 begin
     
 end; 
+
+//Sin terminar
