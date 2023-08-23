@@ -16,7 +16,7 @@ begin
     if n > cantlet then
         SeInvierte:= False;
     else
-        SeInvierte:= true;
+        SeInvierte:= true; 
 
 procedure Inviertir(var arr: TArregloCar; posinicial);
 begin
