@@ -78,5 +78,4 @@ begin
         EscribirArc(Arc_Enteros);
         close(Arc_Enteros);
     end;
-    Erase(Arc_Enteros);
 end.
