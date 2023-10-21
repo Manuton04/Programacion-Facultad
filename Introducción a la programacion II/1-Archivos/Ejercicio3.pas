@@ -18,18 +18,55 @@ begin
         error:= true;
 end;
 
+procedure Intercambiar(var a, b: char);
+var
+    temp: char;
+begin
+    temp:= a;
+    a:= b;
+    b:= temp;
+end;
+
 var 
     Arch: TArchivoChar;
     Arreglo: TArregloChar;
-    Error: Boolean;
+    Error, Sigue: Boolean;
     Nombre: String;
+    carac, SigueC: Char;
 
 begin
+    Sigue:= true;
     write('Escribe el nombre del archivo(Solo, sin puntos, Ej:Caract): ');
     ReadLn(Nombre);
     AbrirArc(Arch, Error, Nombre);
-    if Error then
-    begin
+    if Error then begin
+        while sigue do begin
+            write('Introduce un Caracter Vocal: ');
+            readln(carac);
+            carac:= UpCase(carac);
+            if (carac = 'A') or (carac = 'E') or (carac = 'I') or (carac = 'O') or (carac = 'U') then begin
+                write(Arch, carac)
+            end else begin
+                writeln('El caracter entregado no es vocal, intente de nuevo.');
+            end;
+            write('Desea seguir ingresando caracteres? S/N: ');
+            readln(SigueC);
+            SigueC:= UpCase(SigueC);
+            if SigueC= 'N' then
+                Sigue:= false;
+
+        end;
+        close(Arch);
+        writeln('Caracteres vocales guardados en "', Nombre,'.dat".')
+    end else begin
+        // Crea ARREGLO CON VOCALES DEL ARCHIVO
         
+        // Ordena el arreglo de vocales
+        for i:= 1 to n - 1 do
+            for j:= 1 to n - i do
+                if Arreglo[j] > Arreglo[j + 1] then
+                    Intercambiar(Arreglo[j], Arreglo[j + 1]);
+
+        // MUESTRA EN PANTALLA
     end;
 end.
