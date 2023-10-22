@@ -23,13 +23,14 @@ var
     Arreglo: TArregloChar;
     Error: Boolean;
     Nombre: String;
+    carac: Char;
+    i: Integer;
 
 begin
     write('Escribe el nombre del archivo(Solo, sin puntos, Ej:Caract): ');
     ReadLn(Nombre);
     AbrirArc(Arch, Error, Nombre);
-    if Error then
-    begin
-        
+    if Error then begin
+        rewrite(Arch);
     end;
 end.
