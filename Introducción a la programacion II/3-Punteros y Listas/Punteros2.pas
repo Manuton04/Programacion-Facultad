@@ -54,7 +54,7 @@ begin
     sum:= 0;
     if (L <> nil) then begin
         sum:= sum + L^.num;
-        sum := sum + Sumar(L^.sig);
+        sum:= sum + Sumar(L^.sig);
     end;
     Sumar:= sum;
 end;

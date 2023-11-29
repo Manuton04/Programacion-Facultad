@@ -57,7 +57,7 @@ var
 
 begin
     AbrirArc(Arc_Enteros, Error);
-    if not Error then begin
+    if not Error then begin // EXISTE
             Seek(Arc_Enteros, FileSize(Arc_Enteros));
             Write('Agregue el valor del elemento ', (FileSize(Arc_Enteros)+1),': ');
             ReadLn(Num);
@@ -68,7 +68,7 @@ begin
         writeLn('La suma de los valores es: ', Sumar(Arc_Enteros));
         close(Arc_Enteros);
     end
-    else begin
+    else begin // NO EXISTE
         rewrite(Arc_Enteros);
         for i:= 1 to 3 do begin
             Write('Agregue el valor del elemento ', i, ': ');
