@@ -118,7 +118,7 @@ end;
 
 procedure GuardarArcUsuarios(var arch: TArchivoUsuarios; arbol: TPuntArbol);
 begin
-    Assign(arch, '/work/MTorres_Instapas_Usuarios.dat');
+    Assign(arch, 'C:\Users\manut\OneDrive\Escritorio/MTorres_Instapas_Usuarios.dat');
     rewrite(arch);
     RecorrerPreOrder(arbol, arch);
     close(arch);
@@ -126,7 +126,7 @@ end;
 
 procedure GuardarArcHistorias(var arch: TArchivoHistorias; arbol: TPuntArbol);
 begin
-    Assign(arch, '/work/MTorres_Instapas_Historias.dat');
+    Assign(arch, 'C:\Users\manut\OneDrive\Escritorio/MTorres_Instapas_Historias.dat');
     rewrite(arch);
     RecorrerHistorias(arbol, arch);
     close(arch);
@@ -134,7 +134,7 @@ end;
 
 procedure GuardarArcSeguidos(var arch: TArchivoSeguidos; arbol: TPuntArbol);
 begin
-    Assign(arch, '/work/MTorres_Instapas_Seguidos.dat');
+    Assign(arch, 'C:\Users\manut\OneDrive\Escritorio/MTorres_Instapas_Seguidos.dat');
     rewrite(arch);
     RecorrerSeguidos(arbol, arch);
     close(arch);
@@ -163,7 +163,7 @@ procedure AbrirArcUsuarios(var arch: TArchivoUsuarios);
 var 
     usuario: Usuarios;
 begin
-    Assign(arch, '/work/MTorres_Instapas_Usuarios.dat');
+    Assign(arch, 'C:\Users\manut\OneDrive\Escritorio/MTorres_Instapas_Usuarios.dat');
     {$I-} 
     reset(arch); 
     {$I+} 
@@ -179,7 +179,7 @@ end;
 
 procedure AbrirArcHistorias(var arch: TArchivoHistorias);
 begin
-    Assign(arch, '/work/MTorres_Instapas_Historias.dat');
+    Assign(arch, 'C:\Users\manut\OneDrive\Escritorio/MTorres_Instapas_Historias.dat');
     {$I-} 
     reset(arch); 
     {$I+} 
@@ -191,7 +191,7 @@ end;
 
 procedure AbrirArcSeguidos(var arch: TArchivoSeguidos);
 begin
-    Assign(arch, '/work/MTorres_Instapas_Seguidos.dat');
+    Assign(arch, 'C:\Users\manut\OneDrive\Escritorio/MTorres_Instapas_Seguidos.dat');
     {$I-} 
     reset(arch); 
     {$I+} 
@@ -847,7 +847,7 @@ begin
         write('Escriba al persona que quieres dejar de seguir: ');
         readln(usuario);
         writeln('');
-        while not (ExisteUsuario(usuario, arbol)) and (ExisteSeguido(usuarioActual, usuario)) do begin
+        while not (ExisteUsuario(usuario, arbol)) and (ExisteSeguido(usuarioActual^.Seguidos, usuario)) do begin
             ClrScr;
             writeln('');
             EscribirCentrado('InstaPas');
@@ -861,18 +861,129 @@ begin
         readln(SN);
         if (UpperCase(SN) = 'S') then begin
             terminado:= true;
-            if not ExisteSeguido(usuarioActual^.Seguidos, usuario) then begin
-                AgregarSeguido(usuarioActual^.Seguidos, usuario);
-                writeln('Ahora seguis a ', usuario);
-            end
-            else begin
-                writeln('Ya seguis a ', usuario);
-            end;
+            DejarDeSeguir(usuarioActual^.Seguidos, usuario);
+            writeln('Dejaste de seguir a ', usuario);
         end;     
-    end;
-        
+    end;    
 end;
 
+procedure EliminarDeSeguidos(arbol: TPuntArbol; nombreUsuario: USERNAME);
+var
+    cursor: TPuntArbol;
+    seguidosActual, seguidoAnterior, seguidoActual: TPuntSeguidos;
+begin
+    cursor:= EncontrarUsuario(nombreUsuario, arbol);
+
+    if cursor <> nil then begin
+        seguidosActual:= cursor^.Seguidos;
+        seguidoAnterior:= nil;
+
+        while seguidosActual <> nil do begin
+            if seguidosActual^.nombre = nombreUsuario then begin
+                if seguidoAnterior = nil then
+                    cursor^.Seguidos:= seguidosActual^.Sig
+                else
+                    seguidoAnterior^.Sig:= seguidosActual^.Sig;
+
+                seguidoActual:= seguidosActual;
+                seguidosActual:= seguidosActual^.Sig;
+                Dispose(seguidoActual);
+        end
+        else begin
+            seguidoAnterior:= seguidosActual;
+            seguidosActual:= seguidosActual^.Sig;
+        end;
+        end;
+    end;
+end;
+
+procedure EliminarHistorias(var historias: TPuntHistoria);
+var
+  aux: TPuntHistoria;
+begin
+    while historias <> nil do begin
+        aux:= historias;
+        historias:= historias^.sig;
+        Dispose(aux);
+    end;
+end;
+
+procedure EliminarNodoArbol(var arbol: TPuntArbol; nombreUsuario: USERNAME);
+var
+  aux: TPuntArbol;
+begin
+    if arbol = nil then
+    Exit;
+
+    if nombreUsuario < arbol^.nombre then
+        EliminarNodoArbol(arbol^.menores, nombreUsuario)
+    else if nombreUsuario > arbol^.nombre then
+        EliminarNodoArbol(arbol^.mayores, nombreUsuario)
+    else
+    begin
+        if (arbol^.menores = nil) or (arbol^.mayores = nil) then begin
+            if arbol^.menores = nil then
+                aux := arbol^.mayores
+            else
+                aux := arbol^.menores;
+        
+            Dispose(arbol);
+            arbol:= aux;
+        end
+        else begin
+            aux:= arbol^.mayores;
+            while aux^.menores <> nil do
+                aux:= aux^.menores;
+                arbol^.nombre:= aux^.nombre;
+                arbol^.password:= aux^.password;
+                arbol^.email:= aux^.email;
+                EliminarNodoArbol(arbol^.mayores, aux^.nombre);
+        end;
+    end;
+end;
+
+procedure BorrarUsuario(var arbol: TPuntArbol; username: USERNAME);
+var
+    usuarioAEliminar: TPuntArbol;
+begin
+    usuarioAEliminar:= EncontrarUsuario(username, arbol);
+
+    if usuarioAEliminar <> nil then
+    begin
+        EliminarDeSeguidos(arbol, username);
+        EliminarHistorias(usuarioAEliminar^.Historias);
+        EliminarNodoArbol(arbol, usuarioAEliminar^.nombre);
+        Dispose(usuarioAEliminar);
+    end;
+end;
+
+procedure BorrarUsuarioMenu(var arbol: TPuntArbol; usuario: USERNAME; var iniciado: boolean);
+var
+    terminado: boolean;
+    SN: char;
+begin
+    terminado:= false;
+    while not terminado do begin
+        ClrScr;
+        writeln('');
+        EscribirCentrado('InstaPas');
+        writeln('');
+        write('¿Desea ELIMINAR tu cuenta? S/N: ');
+        readln(SN);
+        if (UpperCase(SN) = 'S') then begin
+            terminado:= true;
+            iniciado:= false;
+            BorrarUsuario(arbol, usuario);
+            ClrScr;
+            writeln('');
+            EscribirCentrado('InstaPas');
+            writeln('');
+            writeln('BORRASTE TU CUENTA.');
+            write('Enter para volver al menu');
+            readln();
+        end;     
+    end;    
+end;
 
 
 // Pantalla que se muestra al empezar el programa //
@@ -959,8 +1070,12 @@ begin
                 cursor:= EncontrarUsuario(usuario.nombre, arbol);
                 SeguirUsuario(cursor, arbol);
             end; 
-            5: ;
-            6: ;
+            5: 
+            begin
+                cursor:= EncontrarUsuario(usuario.nombre, arbol);
+                DejarSeguirUsuario(cursor, arbol);
+            end;
+            6: BorrarUsuarioMenu(arbol, usuario.nombre, iniciado);
             7: iniciado:= false;
         end;
     end;
