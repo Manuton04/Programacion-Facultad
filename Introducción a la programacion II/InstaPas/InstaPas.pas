@@ -957,6 +957,8 @@ begin
     end;
 end;
 
+
+// ES BORRAR EN REALIDAD //
 procedure DejarSeguirUsuarioMenu(var arbol: TPuntArbol; usuario: USERNAME);
 var
     terminado: boolean;
@@ -978,7 +980,7 @@ begin
             EscribirCentrado('InstaPas');
             writeln('');
             writeln('BORRASTE TU CUENTA.');
-            write('Enter para volver al menu');
+            write('Enter para volver al menu: ');
             readln();
         end;     
     end;    
@@ -1100,7 +1102,4 @@ begin
             MenuDos(ArbolUsuarios, Usuario, iniciado);
         end;
     end;
-    
-    
-    
 end.
